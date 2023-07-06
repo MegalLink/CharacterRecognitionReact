@@ -1,11 +1,7 @@
 import * as React from 'react'
-import { CssBaseline } from '@mui/material'
-import { Header } from './components/Header/Header'
-import { HorizontalTabs } from './components/Tabs/Tabs'
-import { FloatingNavigation } from './components/FloatingNavigation/FloatingNavigation'
-import { FormProvider, useForm } from 'react-hook-form'
-import { SnackbarProvider } from 'notistack'
-import { SnackbarUtil } from './shared/utils/snack-bar'
+
+import { ObjectDetector } from './components/ObjectDetector'
+import { AppBar, IconButton, Toolbar, Typography } from '@mui/material'
 
 export interface FormValues {
   documents: string
@@ -18,30 +14,26 @@ export interface FormValues {
 }
 
 export default function App() {
-  const methods = useForm<FormValues>({
-    mode: 'onSubmit',
-    defaultValues: {
-      documents: '',
-      query: '',
-      stopWords: '',
-      vocabulary: '',
-      documentsSeparator: '',
-      wordSeparator: '',
-      vectorialMethod: 0,
-    },
-  })
-
   return (
     <React.Fragment>
-      <SnackbarProvider maxSnack={5} autoHideDuration={2000}>
-        <SnackbarUtil />
-        <FormProvider {...methods}>
-          <CssBaseline />
-          <Header />
-          <HorizontalTabs />
-          <FloatingNavigation />
-        </FormProvider>
-      </SnackbarProvider>
+      <AppBar component='nav'>
+        <Toolbar>
+          <IconButton
+            color='inherit'
+            aria-label='open drawer'
+            edge='start'
+            sx={{ mr: 2, display: { sm: 'none' } }}
+          ></IconButton>
+          <Typography
+            variant='h6'
+            component='div'
+            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+          >
+            Aprende conmigo
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <ObjectDetector />
     </React.Fragment>
   )
 }
