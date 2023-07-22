@@ -1,35 +1,54 @@
 // Import dependencies
-import React, { useRef, useState } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import Webcam from 'react-webcam'
 // eslint-disable-next-line
-import { Alert, Box, Button, Container } from '@mui/material'
+import { Alert, Box, Button, Container, Fab, IconButton } from '@mui/material'
 import { createWorker } from 'tesseract.js'
 import ParkIcon from '@mui/icons-material/Park'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import StopIcon from '@mui/icons-material/Stop'
 
-export function ObjectDetector() {
-  const actualChar = 'A'
-  const actualNumber = 5
-  const array = Array(5).fill(1)
+interface ObjectDetectorProps {
+  type: string
+  values: string[]
+}
 
-  const imageURL = 'https://cdn.pixabay.com/photo/2016/09/08/13/58/desert-1654439_1280.jpg'
+export const ObjectDetector: FC<ObjectDetectorProps> = ({ type, values }) => {
+  const [actualValue, setActualValue] = useState<string>(values[0])
+  const [actualIndex, setActualIndex] = useState(0)
+  const [isGameDone, setGameDone] = useState(false)
+
+  const imageURL =
+    'https://thumbs.dreamstime.com/b/textura-incons%C3%BAtil-de-la-tela-del-fondo-color-turquesa-119902970.jpg'
   const webcamRef = useRef<Webcam>(null)
   const [matched, setMached] = useState(false)
-
   let interval: NodeJS.Timer
 
   const initDetection = async () => {
     setMached(false)
     let count = 0
     interval = setInterval(() => {
-      console.log(count)
-      if (count < 3) {
-        count++
-        detected()
+      console.log('try:', count)
+      if (actualIndex < values.length) {
+        if (count < 5) {
+          count++
+          detected().then((isDetected: boolean) => {
+            if (isDetected) {
+              console.log('isDetected', isDetected)
+              setActualIndex(actualIndex + 1)
+              setActualValue(values[actualIndex + 1])
+            }
+          })
+        } else {
+          clearInterval(interval)
+          console.log('Not detecting anymore')
+        }
       } else {
         clearInterval(interval)
-        console.log('Not detecting anymore')
+        setGameDone(true)
+        console.log('GAME DOME')
       }
-    }, 3000)
+    }, 1000)
   }
 
   // Main function
@@ -44,69 +63,95 @@ export function ObjectDetector() {
     const {
       data: { text },
     } = await (await worker).recognize(imageSrc!)
-    // console.log('Text', text)
-    console.log('Detecting')
+    console.log('Text', text)
+    console.log('Detecting', actualValue)
     await (await worker).terminate()
-    if (text.indexOf(actualChar) !== -1) {
-      console.log('Detected', actualChar)
+    if (text.toLowerCase().indexOf(actualValue.toLowerCase()) !== -1) {
+      console.log('Detected', actualValue)
       setMached(true)
       clearInterval(interval)
+
       return true
     }
     return false
   }
+  useEffect(() => {
+    if (actualIndex === values.length) {
+      setGameDone(true)
+      setMached(false)
+    }
+  }, [actualValue])
 
   return (
-    <Container
+    <div
       className='App'
-      sx={{
-        mt: 5,
+      style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundImage:
+          'url(https://as1.ftcdn.net/v2/jpg/02/07/18/42/1000_F_207184271_KGYtC1btjugpk0O6CVJSKnDI7BZ8PXkZ.jpg)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        width: '100vw',
+        height: '100vh',
         flexDirection: 'column',
       }}
     >
-      <Box className=''>
-        <Webcam
-          ref={webcamRef}
-          muted={true}
-          width={400}
-          height={400}
-          style={{
-            textAlign: 'center',
-            zIndex: -1,
-          }}
-        />
-      </Box>
-
-      <Box
-        sx={{
-          width: 400,
-          height: 400,
-          backgroundImage: `url(${imageURL})`,
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
+      <div
+        style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          mb: 2,
         }}
       >
-        {array.map((value, index) => (
+        <Box
+          sx={{
+            flex: 3,
+            width: 800,
+            height: 500,
+            backgroundImage: `url(${imageURL})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+
+            mb: 2,
+          }}
+        >
+          {/* {array.map((value, index) => (
           <ParkIcon color='success' key={index} fontSize='large' />
-        ))}
+       ))}*/}
+        </Box>
+
+        <Box>
+          <Webcam
+            ref={webcamRef}
+            muted={true}
+            width={500}
+            height={500}
+            style={{
+              textAlign: 'center',
+              position: 'relative',
+              right: '30px',
+              bottom: '20px',
+            }}
+          />
+        </Box>
+      </div>
+      {matched && <Alert severity='success'>Detected {values[actualIndex - 1]} successfully</Alert>}
+      {isGameDone && <Alert severity='success'>Game Done</Alert>}
+      <Box sx={{ display: 'flex', gap: '10' }}>
+        <Fab color='primary' aria-label='add' onClick={() => initDetection()}>
+          <PlayArrowIcon />
+        </Fab>
+        <Fab color='primary' aria-label='add' onClick={() => clearInterval(interval)}>
+          <StopIcon />
+        </Fab>
       </Box>
-      {matched && <Alert severity='success'>Detected {actualChar} successfully</Alert>}
-      <Box sx={{ mt: 2 }}>
-        <Button sx={{ mx: 2 }} variant='contained' onClick={() => initDetection()}>
-          Start Detection
-        </Button>
-        <Button sx={{ mx: 2 }} variant='outlined' onClick={() => clearInterval(interval)}>
-          Stop Detection
-        </Button>
-      </Box>
-    </Container>
+    </div>
   )
 }
