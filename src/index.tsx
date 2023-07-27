@@ -11,10 +11,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
 import { GamePage } from './pages/GamePage'
 import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider } from '@mui/material'
+import { theme } from './theme/theme'
 
 const root = createRoot(document.getElementById('root') as HTMLElement)
 root.render(
-  <StrictMode>
+  <ThemeProvider theme={theme}>
     <CssBaseline />
     <BrowserRouter>
       <Routes>
@@ -23,7 +25,7 @@ root.render(
         <Route path={'game/numbers'} element={<GamePage />} />
       </Routes>
     </BrowserRouter>
-  </StrictMode>,
+  </ThemeProvider>,
 )
 
 // If you want to start measuring performance in your app, pass a function

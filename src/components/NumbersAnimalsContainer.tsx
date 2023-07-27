@@ -19,6 +19,7 @@ export const AnimalsContainer: FC<AnimalsContainerProps> = ({ repeat }) => {
   const width = 800
   const height = 500
 
+  console.log('Repeat', repeat)
   const randomPosition = () => {
     const x = Math.floor(Math.random() * 100) - 100
     const y = Math.floor(Math.random() * 250) - 100
@@ -27,7 +28,7 @@ export const AnimalsContainer: FC<AnimalsContainerProps> = ({ repeat }) => {
 
   const renderComponents = () => {
     const randomImage: string = animalImages[Math.floor(Math.random() * 5)]
-    return Array.from(Array(repeat), (_, index) => index + 1).map((_, index) => {
+    return Array.from(Array(repeat), (_, index) => index).map((_, index) => {
       const position = randomPosition()
       return (
         <Box
@@ -45,25 +46,27 @@ export const AnimalsContainer: FC<AnimalsContainerProps> = ({ repeat }) => {
       )
     })
   }
+  if (!Number.isNaN(repeat)) {
+    return (
+      <Box
+        sx={{
+          flex: 3,
+          width: width,
+          height: height,
+          backgroundImage: `url(${imageURL})`,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          mb: 2,
+        }}
+      >
+        {renderComponents()}
+      </Box>
+    )
+  }
 
-  return (
-    <Box
-      sx={{
-        flex: 3,
-        width: width,
-        height: height,
-        backgroundImage: `url(${imageURL})`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-
-        mb: 2,
-      }}
-    >
-      {renderComponents()}
-    </Box>
-  )
+  return <div></div>
 }

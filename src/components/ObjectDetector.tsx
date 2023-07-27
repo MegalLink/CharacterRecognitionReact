@@ -1,14 +1,12 @@
 // Import dependencies
 import React, { FC, useEffect, useRef, useState } from 'react'
 import Webcam from 'react-webcam'
-import { Alert, Box, CardMedia, Fab } from '@mui/material'
+import { Box, Fab } from '@mui/material'
 import { createWorker } from 'tesseract.js'
-import ParkIcon from '@mui/icons-material/Park'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import StopIcon from '@mui/icons-material/Stop'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import * as bird from '../assets/animals/bird.png'
 import { AnimalsContainer } from './NumbersAnimalsContainer'
 const MySwal = withReactContent(Swal)
 
@@ -26,7 +24,6 @@ enum GameState {
 export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) => {
   const [actualValue, setActualValue] = useState<string>(values[0])
   const [actualIndex, setActualIndex] = useState(0)
-  const [isGameDone, setGameDone] = useState(false)
   const [matched, setMached] = useState<GameState>(GameState.NONE)
 
   const webcamRef = useRef<Webcam>(null)
@@ -54,14 +51,12 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
         }
       } else {
         clearInterval(interval)
-        setGameDone(true)
         MySwal.fire({
           icon: 'success',
           title: 'Juego Terminado',
           showConfirmButton: false,
           timer: 3000,
         })
-        console.log('GAME DOME')
       }
     }, 1000)
   }
@@ -78,7 +73,7 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
     const {
       data: { text },
     } = await (await worker).recognize(imageSrc!)
-    console.log('Text', text)
+    // console.log('Text', text)
     console.log('Detecting', actualValue)
     await (await worker).terminate()
     if (text.toLowerCase().indexOf(actualValue.toLowerCase()) !== -1) {
@@ -98,7 +93,6 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
         showConfirmButton: false,
         timer: 3000,
       })
-      setGameDone(true)
       setMached(GameState.NONE)
     }
   }, [actualValue])
@@ -168,12 +162,9 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
         </Box>
       </div>
 
-      <Box sx={{ display: 'flex', gap: '10' }}>
+      <Box sx={{ display: 'flex', gap: '10', justifyContent: 'space-evenly', width: '200px' }}>
         <Fab color='primary' aria-label='add' onClick={() => initDetection()}>
           <PlayArrowIcon />
-        </Fab>
-        <Fab color='primary' aria-label='add' onClick={() => clearInterval(interval)}>
-          <StopIcon />
         </Fab>
         <Fab color='primary' aria-label='add' onClick={() => clearInterval(interval)}>
           <StopIcon />
