@@ -1,31 +1,39 @@
 // Import dependencies
 import React, { FC, useEffect, useRef, useState } from 'react'
 import Webcam from 'react-webcam'
-// eslint-disable-next-line
-import { Alert, Box, Button, Container, Fab, IconButton } from '@mui/material'
+import { Alert, Box, CardMedia, Fab } from '@mui/material'
 import { createWorker } from 'tesseract.js'
 import ParkIcon from '@mui/icons-material/Park'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import StopIcon from '@mui/icons-material/Stop'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import * as bird from '../assets/animals/bird.png'
+import { AnimalsContainer } from './NumbersAnimalsContainer'
+const MySwal = withReactContent(Swal)
 
 interface ObjectDetectorProps {
-  type: string
+  gameType: string
   values: string[]
 }
 
-export const ObjectDetector: FC<ObjectDetectorProps> = ({ type, values }) => {
+enum GameState {
+  NONE,
+  SUCCESS,
+  FAILED,
+}
+
+export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) => {
   const [actualValue, setActualValue] = useState<string>(values[0])
   const [actualIndex, setActualIndex] = useState(0)
   const [isGameDone, setGameDone] = useState(false)
+  const [matched, setMached] = useState<GameState>(GameState.NONE)
 
-  const imageURL =
-    'https://thumbs.dreamstime.com/b/textura-incons%C3%BAtil-de-la-tela-del-fondo-color-turquesa-119902970.jpg'
   const webcamRef = useRef<Webcam>(null)
-  const [matched, setMached] = useState(false)
   let interval: NodeJS.Timer
 
   const initDetection = async () => {
-    setMached(false)
+    setMached(GameState.NONE)
     let count = 0
     interval = setInterval(() => {
       console.log('try:', count)
@@ -42,10 +50,17 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ type, values }) => {
         } else {
           clearInterval(interval)
           console.log('Not detecting anymore')
+          setMached(GameState.FAILED)
         }
       } else {
         clearInterval(interval)
         setGameDone(true)
+        MySwal.fire({
+          icon: 'success',
+          title: 'Juego Terminado',
+          showConfirmButton: false,
+          timer: 3000,
+        })
         console.log('GAME DOME')
       }
     }, 1000)
@@ -68,7 +83,7 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ type, values }) => {
     await (await worker).terminate()
     if (text.toLowerCase().indexOf(actualValue.toLowerCase()) !== -1) {
       console.log('Detected', actualValue)
-      setMached(true)
+      setMached(GameState.SUCCESS)
       clearInterval(interval)
 
       return true
@@ -77,10 +92,39 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ type, values }) => {
   }
   useEffect(() => {
     if (actualIndex === values.length) {
+      MySwal.fire({
+        icon: 'success',
+        title: 'Juego Terminado',
+        showConfirmButton: false,
+        timer: 3000,
+      })
       setGameDone(true)
-      setMached(false)
+      setMached(GameState.NONE)
     }
   }, [actualValue])
+
+  useEffect(() => {
+    switch (matched) {
+      case GameState.NONE:
+        break
+      case GameState.SUCCESS:
+        MySwal.fire({
+          icon: 'success',
+          title: 'Respuesta correcta',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        break
+      case GameState.FAILED:
+        MySwal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          showConfirmButton: false,
+          timer: 3000,
+        })
+        break
+    }
+  }, [matched])
 
   return (
     <div
@@ -106,26 +150,7 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ type, values }) => {
           alignItems: 'center',
         }}
       >
-        <Box
-          sx={{
-            flex: 3,
-            width: 800,
-            height: 500,
-            backgroundImage: `url(${imageURL})`,
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-
-            mb: 2,
-          }}
-        >
-          {/* {array.map((value, index) => (
-          <ParkIcon color='success' key={index} fontSize='large' />
-       ))}*/}
-        </Box>
+        <AnimalsContainer repeat={parseInt(values[actualIndex])} />
 
         <Box>
           <Webcam
@@ -142,11 +167,13 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ type, values }) => {
           />
         </Box>
       </div>
-      {matched && <Alert severity='success'>Detected {values[actualIndex - 1]} successfully</Alert>}
-      {isGameDone && <Alert severity='success'>Game Done</Alert>}
+
       <Box sx={{ display: 'flex', gap: '10' }}>
         <Fab color='primary' aria-label='add' onClick={() => initDetection()}>
           <PlayArrowIcon />
+        </Fab>
+        <Fab color='primary' aria-label='add' onClick={() => clearInterval(interval)}>
+          <StopIcon />
         </Fab>
         <Fab color='primary' aria-label='add' onClick={() => clearInterval(interval)}>
           <StopIcon />

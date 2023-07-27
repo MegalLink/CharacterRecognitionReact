@@ -26,6 +26,8 @@
     "react-router-dom": "^6.14.1",
     "react-scripts": "5.0.1",
     "react-webcam": "^7.1.1",
+    "sweetalert2": "^11.7.20",
+    "sweetalert2-react-content": "^5.0.7",
     "tesseract.js": "^4.1.1",
     "ts-mockery": "^1.2.0",
     "typescript": "^4.7.4",

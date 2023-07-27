@@ -44,7 +44,7 @@ export const GamePage = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-      {!isEmpty(list) ? <ObjectDetector type={type} values={list} /> : <p>Loading</p>}
+      {!isEmpty(list) ? <ObjectDetector gameType={type} values={list} /> : <p>Loading</p>}
     </React.Fragment>
   )
 }
