@@ -1,5 +1,4 @@
 import { createTheme } from '@mui/material/styles'
-import { purple } from '@mui/material/colors'
 
 export const theme = createTheme({
   palette: {
@@ -7,7 +6,10 @@ export const theme = createTheme({
       main: '#009688',
     },
     secondary: {
-      main: '#00e676',
+      main: '#99582a',
+    },
+    info: {
+      main: '#ffe6a7',
     },
   },
 })

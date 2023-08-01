@@ -8,10 +8,15 @@ import StopIcon from '@mui/icons-material/Stop'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { AnimalsContainer } from './NumbersAnimalsContainer'
+import { GameType } from '../pages/GamePage'
+import { VocalsContainer } from './VocalsContainer'
+import { useNavigate } from 'react-router-dom'
+import { theme } from '../theme/theme'
+
 const MySwal = withReactContent(Swal)
 
 interface ObjectDetectorProps {
-  gameType: string
+  gameType: GameType
   values: string[]
 }
 
@@ -25,7 +30,10 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
   const [actualValue, setActualValue] = useState<string>(values[0])
   const [actualIndex, setActualIndex] = useState(0)
   const [matched, setMached] = useState<GameState>(GameState.NONE)
-
+  const [isGameDone, setIsGameDone] = useState(false)
+  const navigate = useNavigate()
+  const maxSnapshot = 6
+  const sucessDelay = 3000
   const webcamRef = useRef<Webcam>(null)
   let interval: NodeJS.Timer
 
@@ -35,7 +43,7 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
     interval = setInterval(() => {
       console.log('try:', count)
       if (actualIndex < values.length) {
-        if (count < 5) {
+        if (count < maxSnapshot) {
           count++
           detected().then((isDetected: boolean) => {
             if (isDetected) {
@@ -50,13 +58,10 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
           setMached(GameState.FAILED)
         }
       } else {
+        // TODO THIS IS JUST A SAFE CASE BUT THE GAME SHOULD NOT GET IN HERE
+        console.log('GAME DOME ON INTERVAL')
         clearInterval(interval)
-        MySwal.fire({
-          icon: 'success',
-          title: 'Juego Terminado',
-          showConfirmButton: false,
-          timer: 3000,
-        })
+        setIsGameDone(true)
       }
     }, 1000)
   }
@@ -85,17 +90,49 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
     }
     return false
   }
+
+  const setGameComponent = (gameType: GameType) => {
+    switch (gameType) {
+      case GameType.VOCALS:
+        return <VocalsContainer vocal={values[actualIndex]} />
+      case GameType.NUMBERS:
+        return <AnimalsContainer repeat={parseInt(values[actualIndex])} />
+      case GameType.UNDEFINED:
+        ;<></>
+    }
+  }
+
   useEffect(() => {
     if (actualIndex === values.length) {
-      MySwal.fire({
-        icon: 'success',
-        title: 'Juego Terminado',
-        showConfirmButton: false,
-        timer: 3000,
-      })
+      setIsGameDone(true)
+      console.log('GAME DOME BY INDEX')
+
       setMached(GameState.NONE)
     }
   }, [actualValue])
+
+  useEffect(() => {
+    if (isGameDone) {
+      setTimeout(() => {
+        MySwal.fire({
+          title: 'JUEGO TERMINADO',
+          text: 'Quiere jugar denuevo?',
+          icon: 'success',
+          showCancelButton: true,
+          confirmButtonColor: `${theme.palette.primary.main}`,
+          cancelButtonColor: `${theme.palette.secondary.main}`,
+          confirmButtonText: 'Si, jugar denuevo',
+          cancelButtonText: 'No, ir al menu principal',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate(0)
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            navigate('/')
+          }
+        })
+      }, sucessDelay + 10)
+    }
+  }, [isGameDone])
 
   useEffect(() => {
     switch (matched) {
@@ -106,15 +143,15 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
           icon: 'success',
           title: 'Respuesta correcta',
           showConfirmButton: false,
-          timer: 3000,
+          timer: sucessDelay,
         })
         break
       case GameState.FAILED:
         MySwal.fire({
           icon: 'error',
-          title: 'Oops...',
+          title: 'Intentalo denuevo',
           showConfirmButton: false,
-          timer: 3000,
+          timer: sucessDelay,
         })
         break
     }
@@ -144,7 +181,7 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
           alignItems: 'center',
         }}
       >
-        <AnimalsContainer repeat={parseInt(values[actualIndex])} />
+        {setGameComponent(gameType)}
 
         <Box>
           <Webcam

@@ -3,6 +3,7 @@ import { Container, Typography } from '@mui/material'
 import { MainButton } from '../components/Button/Button'
 import HeaderSVG from './../assets/headerBackground.svg'
 import { useNavigate } from 'react-router-dom'
+import { theme } from '../theme/theme'
 export const HomePage = () => {
   const navigate = useNavigate()
   return (
@@ -39,7 +40,7 @@ export const HomePage = () => {
             gap: '12px',
           }}
         >
-          <Typography variant='h1' color={'#557A46'}>
+          <Typography variant='h1' color={theme.palette.primary.main}>
             {' '}
             Juguemos{' '}
           </Typography>
@@ -55,6 +56,7 @@ export const HomePage = () => {
           >
             <MainButton onClick={() => navigate('game/vocals')}> Jugar con vocales</MainButton>
             <MainButton onClick={() => navigate('game/numbers')}> Jugar con Numeros</MainButton>
+            <MainButton onClick={() => navigate('faq')}> Preguntas Frecuentes</MainButton>
           </div>
         </div>
       </div>

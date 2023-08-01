@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import React, { useState, useEffect, FC } from 'react'
+import React, { FC } from 'react'
 import bird from '../assets/animals/bird.png'
 import butterfly from '../assets/animals/butterfly.png'
 import cat from '../assets/animals/cat.png'
@@ -19,7 +19,6 @@ export const AnimalsContainer: FC<AnimalsContainerProps> = ({ repeat }) => {
   const width = 800
   const height = 500
 
-  console.log('Repeat', repeat)
   const randomPosition = () => {
     const x = Math.floor(Math.random() * 100) - 100
     const y = Math.floor(Math.random() * 250) - 100

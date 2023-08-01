@@ -1,5 +1,4 @@
 import React from 'react'
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
@@ -13,6 +12,7 @@ import { GamePage } from './pages/GamePage'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material'
 import { theme } from './theme/theme'
+import { FaqPage } from './pages/FaqPage'
 
 const root = createRoot(document.getElementById('root') as HTMLElement)
 root.render(
@@ -23,6 +23,7 @@ root.render(
         <Route index element={<HomePage />} />
         <Route path={'game/vocals'} element={<GamePage />} />
         <Route path={'game/numbers'} element={<GamePage />} />
+        <Route path={'faq'} element={<FaqPage />} />
       </Routes>
     </BrowserRouter>
   </ThemeProvider>,
