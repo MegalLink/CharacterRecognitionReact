@@ -12,7 +12,7 @@ export enum GameType {
 
 export const GamePage = () => {
   const location = useLocation()
-  const vocals: string[] = ['A', 'U']
+  const vocals: string[] = ['A', 'E', , 'I', 'O', 'U']
   const numbers: string[] = ['1', '2', '3', '4', '5', '6']
   const [list, setList] = useState<string[]>([])
   const [type, setType] = useState(GameType.UNDEFINED)
