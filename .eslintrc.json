@@ -22,6 +22,7 @@
     "spaced-comment": "error",
     "@typescript-eslint/no-empty-function": ["error", { "allow": ["arrowFunctions"] }],
     "@typescript-eslint/no-explicit-any": ["off"],
+    "@typescript-eslint/no-non-null-assertion":["off"],
     "react/display-name": "off"
   },
   "settings": {
