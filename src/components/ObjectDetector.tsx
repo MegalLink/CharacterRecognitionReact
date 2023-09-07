@@ -1,7 +1,7 @@
 // Import dependencies
 import React, { FC, useEffect, useRef, useState } from 'react'
 import Webcam from 'react-webcam'
-import { Box, Fab } from '@mui/material'
+import { Box, Fab, Typography } from '@mui/material'
 import { createWorker } from 'tesseract.js'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import StopIcon from '@mui/icons-material/Stop'
@@ -102,6 +102,17 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
     }
   }
 
+  const getGameText = (gameType: GameType): string => {
+    switch (gameType) {
+      case GameType.VOCALS:
+        return '¿Con que vocal comienza el animal o objeto en el bosque?'
+      case GameType.NUMBERS:
+        return '¿Cuántos animales hay en el bosque?'
+      case GameType.UNDEFINED:
+        return ''
+    }
+  }
+
   useEffect(() => {
     if (actualIndex === values.length) {
       setIsGameDone(true)
@@ -142,6 +153,10 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
         MySwal.fire({
           icon: 'success',
           title: 'Respuesta correcta',
+          imageUrl: 'https://www.pngmart.com/files/15/Happy-Face-Emoji-PNG.png',
+          imageWidth: 200,
+          imageHeight: 200,
+          imageAlt: 'Happy face success',
           showConfirmButton: false,
           timer: sucessDelay,
         })
@@ -174,6 +189,12 @@ export const ObjectDetector: FC<ObjectDetectorProps> = ({ gameType, values }) =>
         flexDirection: 'column',
       }}
     >
+      <Box sx={{ marginBottom: '5%', opacity: [0.9, 0.8, 0.7] }}>
+        {' '}
+        <Typography variant='h3' color={'secondary'}>
+          {getGameText(gameType)}{' '}
+        </Typography>
+      </Box>
       <div
         style={{
           display: 'flex',
